@@ -1,4 +1,5 @@
 import * as cdk from 'aws-cdk-lib/core';
+import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
@@ -12,5 +13,11 @@ export class SobaCdkStack extends cdk.Stack {
     // const queue = new sqs.Queue(this, 'SobaCdkQueue', {
     //   visibilityTimeout: cdk.Duration.seconds(300)
     // });
+
+    // Route 53 hosted zone for delegation from SOBA Squarespace account
+    const hostedZone = new HostedZone(this, 'SOBAHostedZone', {
+      zoneName: 'services.seattleoba.org',
+    });
+    hostedZone.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
   }
 }
