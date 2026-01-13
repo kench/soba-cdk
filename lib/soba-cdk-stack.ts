@@ -8,6 +8,7 @@ import { S3BucketOrigin, S3StaticWebsiteOrigin } from 'aws-cdk-lib/aws-cloudfron
 import { Certificate, CertificateValidation, DnsValidatedCertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import HostedZoneStack from './hosted-zone';
+import DynamoDBStack from './dynamodb';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class SobaCdkStack extends cdk.Stack {
@@ -62,5 +63,7 @@ export class SobaCdkStack extends cdk.Stack {
       zone: hostedZone,
       target: RecordTarget.fromAlias(new CloudFrontTarget(servicesWebsiteDistribution))
     });
+
+    const dynamoDbStack = new DynamoDBStack(this, 'DynamoDBStack');
   }
 }
