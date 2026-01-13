@@ -7,6 +7,7 @@ import { Distribution, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin, S3StaticWebsiteOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Certificate, CertificateValidation, DnsValidatedCertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
+import HostedZoneStack from './hosted-zone';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class SobaCdkStack extends cdk.Stack {
@@ -20,6 +21,7 @@ export class SobaCdkStack extends cdk.Stack {
     //   visibilityTimeout: cdk.Duration.seconds(300)
     // });
 
+    const hostedZoneStack = new HostedZoneStack(this, 'HostedZoneStack');
     // Route 53 hosted zone for delegation from SOBA Squarespace account
     const hostedZone = new HostedZone(this, 'SOBAHostedZone', {
       zoneName: 'services.seattleoba.org',
