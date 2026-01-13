@@ -22,11 +22,7 @@ export class SobaCdkStack extends cdk.Stack {
     // });
 
     const hostedZoneStack = new HostedZoneStack(this, 'HostedZoneStack');
-    // Route 53 hosted zone for delegation from SOBA Squarespace account
-    const hostedZone = new HostedZone(this, 'SOBAHostedZone', {
-      zoneName: 'services.seattleoba.org',
-    });
-    hostedZone.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+    const hostedZone = hostedZoneStack.hostedZone;
 
     // S3 bucket for website
     const websiteBucket = new Bucket(this, 'ServicesWebsiteBucket', {
