@@ -39,7 +39,7 @@ class DynamoDBStack extends NestedStack {
       globalSecondaryIndexes: [
         {
           indexName: 'UserId',
-          partitionKey: { name: 'twitch_user_id', type: AttributeType.NUMBER }
+          partitionKey: { name: 'twitch_id', type: AttributeType.NUMBER }
         },
         {
           indexName: 'EventId',
