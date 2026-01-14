@@ -10,6 +10,8 @@ import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import HostedZoneStack from './hosted-zone';
 import DynamoDBStack from './dynamodb';
 import SecretsStack from './secrets';
+import S3Stack from './s3';
+import { Duration } from 'aws-cdk-lib/core';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class SobaCdkStack extends cdk.Stack {
@@ -53,6 +55,13 @@ export class SobaCdkStack extends cdk.Stack {
       defaultBehavior: {
         origin: S3BucketOrigin.withOriginAccessControl(websiteBucket)
       },
+      errorResponses: [
+        {
+          httpStatus: 403,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html'
+        }
+      ],
       domainNames: ['services.seattleoba.org']
     });
 
@@ -67,5 +76,6 @@ export class SobaCdkStack extends cdk.Stack {
 
     const dynamoDbStack = new DynamoDBStack(this, 'DynamoDBStack');
     const secretsStack = new SecretsStack(this, 'SecretsStack');
+    const s3Stack = new S3Stack(this, 'S3Stack');
   }
 }
