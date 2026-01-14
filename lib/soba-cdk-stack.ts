@@ -9,6 +9,7 @@ import { Certificate, CertificateValidation, DnsValidatedCertificate } from 'aws
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import HostedZoneStack from './hosted-zone';
 import DynamoDBStack from './dynamodb';
+import SecretsStack from './secrets';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class SobaCdkStack extends cdk.Stack {
@@ -65,5 +66,6 @@ export class SobaCdkStack extends cdk.Stack {
     });
 
     const dynamoDbStack = new DynamoDBStack(this, 'DynamoDBStack');
+    const secretsStack = new SecretsStack(this, 'SecretsStack');
   }
 }
