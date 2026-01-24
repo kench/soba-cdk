@@ -12,8 +12,8 @@ class DynamoDBStack extends NestedStack {
 
     const bevyTicketTable = new TableV2(this, 'BevyTicketsTable', {
       billing: Billing.onDemand(),
-      partitionKey: { name: 'id', type: AttributeType.NUMBER },
-      sortKey: { name: 'event_id', type: AttributeType.NUMBER },
+      partitionKey: { name: 'event_id', type: AttributeType.NUMBER },
+      sortKey: { name: 'id', type: AttributeType.NUMBER },
       tableClass: TableClass.STANDARD,
       tableName: 'BevyTickets'
     });
@@ -39,11 +39,13 @@ class DynamoDBStack extends NestedStack {
       globalSecondaryIndexes: [
         {
           indexName: 'UserId',
-          partitionKey: { name: 'twitch_id', type: AttributeType.NUMBER }
+          partitionKey: { name: 'twitch_id', type: AttributeType.NUMBER },
+          sortKey: { name: 'bevy_event_id', type: AttributeType.NUMBER }
         },
         {
           indexName: 'EventId',
-          partitionKey: { name: 'bevy_event_id', type: AttributeType.NUMBER }
+          partitionKey: { name: 'bevy_event_id', type: AttributeType.NUMBER },
+          sortKey: { name: 'twitch_id', type: AttributeType.NUMBER }
         }
       ]
     });
