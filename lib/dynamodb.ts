@@ -1,5 +1,5 @@
 import { NestedStack } from "aws-cdk-lib";
-import { AttributeType, Billing, TableClass, TableV2 } from "aws-cdk-lib/aws-dynamodb";
+import { AttributeType, Billing, StreamViewType, TableClass, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 
 class DynamoDBStack extends NestedStack {
@@ -14,6 +14,7 @@ class DynamoDBStack extends NestedStack {
       billing: Billing.onDemand(),
       partitionKey: { name: 'event_id', type: AttributeType.NUMBER },
       sortKey: { name: 'id', type: AttributeType.NUMBER },
+      dynamoStream: StreamViewType.NEW_IMAGE,
       tableClass: TableClass.STANDARD,
       tableName: 'BevyTickets'
     });

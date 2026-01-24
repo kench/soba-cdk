@@ -1,3 +1,6 @@
 [submodule "assets/services-website"]
 	path = assets/services-website
 	url = https://github.com/kench/soba-services-website.git
+[submodule "assets/data-lambda"]
+	path = assets/data-lambda
+	url = https://github.com/kench/soba-data-lambda
