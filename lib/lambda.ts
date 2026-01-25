@@ -1,9 +1,10 @@
 import { Duration, NestedStack } from "aws-cdk-lib";
 import { ITable } from "aws-cdk-lib/aws-dynamodb";
-import { Architecture, Code, Function, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Architecture, Code, Function, LayerVersion, MetricType, Runtime, StartingPosition } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { TWITCH_API_CLIENT_ID } from "./constants";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { DynamoEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 
 const SECRETS_LAMBDA_EXTENSION_ARN = 'arn:aws:lambda:us-west-2:345057560386:layer:AWS-Parameters-and-Secrets-Lambda-Extension-Arm64:24';
 
@@ -26,7 +27,7 @@ export class LambdaStack extends NestedStack {
             runtime: Runtime.JAVA_21,
             timeout: Duration.seconds(10),
             memorySize: 512,
-            handler: 'org.seattleoba.lambda.BevyTicketDynamodbEventHandler',
+            handler: 'org.seattleoba.lambda.EventHandler',
             code: Code.fromAsset('./assets/data-lambda/app/build/distributions/app.zip'),
             layers: [LayerVersion.fromLayerVersionArn(this, 'SecretsLayer', SECRETS_LAMBDA_EXTENSION_ARN)],
             environment: {
@@ -39,5 +40,12 @@ export class LambdaStack extends NestedStack {
         props.twitchAccounts.grantReadWriteData(twitchAccountSyncFunction);
         props.twitchAccountsBevyTickets.grantReadWriteData(twitchAccountSyncFunction);
         props.twitchClientSecret.grantRead(twitchAccountSyncFunction);
+
+        twitchAccountSyncFunction.addEventSource(new DynamoEventSource(props.bevyTickets, {
+            startingPosition: StartingPosition.LATEST,
+            metricsConfig: {
+                metrics: [MetricType.EVENT_COUNT]
+            }
+        }));
     }
 }
