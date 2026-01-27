@@ -6,6 +6,7 @@ import SecretsStack from './secrets';
 import S3Stack from './s3';
 import { ServicesWebsiteStack } from './services-website';
 import { LambdaStack } from './lambda';
+import { SQSStack } from './sqs';
 
 export class SobaCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -17,12 +18,15 @@ export class SobaCdkStack extends cdk.Stack {
     const dynamoDbStack = new DynamoDBStack(this, 'DynamoDBStack');
     const secretsStack = new SecretsStack(this, 'SecretsStack');
     const s3Stack = new S3Stack(this, 'S3Stack');
+    const sqsStack = new SQSStack(this, 'SQSStack');
     const servicesWebsiteStack = new ServicesWebsiteStack(this, 'ServicesWebsiteStack', {
       hostedZone: hostedZone,
     });
 
     const lambdaStack = new LambdaStack(this, 'LambdaStack', {
+      bevyFilesBucket: s3Stack.bevyFilesBucket,
       bevyTickets: dynamoDbStack.bevyTickets,
+      bevyTicketEventsQueue: sqsStack.bevyTicketEvents,
       twitchAccounts: dynamoDbStack.twitchAccounts,
       twitchAccountsBevyTickets: dynamoDbStack.twitchAccountsBevyTickets,
       twitchClientSecret: secretsStack.twitchClientSecret,

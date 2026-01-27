@@ -10,17 +10,21 @@ class DynamoDBStack extends NestedStack {
   constructor(scope: Construct, id: string) {
     super(scope, id);
 
-    const bevyTicketTable = new TableV2(this, 'BevyTicketsTable', {
+    const bevyTicketTable = new TableV2(this, 'BevyTicketTable', {
       billing: Billing.onDemand(),
       partitionKey: { name: 'event_id', type: AttributeType.NUMBER },
       sortKey: { name: 'id', type: AttributeType.NUMBER },
       dynamoStream: StreamViewType.NEW_IMAGE,
       tableClass: TableClass.STANDARD,
-      tableName: 'BevyTickets'
+      tableName: 'BevyTickets',
+      globalSecondaryIndexes: [{
+        indexName: 'TicketId',
+        partitionKey: { name: 'ticket_id', type: AttributeType.STRING }
+      }]
     });
     this.bevyTickets = bevyTicketTable;
 
-    const twitchAccountTable = new TableV2(this, 'TwitchAccountsTable', {
+    const twitchAccountTable = new TableV2(this, 'TwitchAccountTable', {
       billing: Billing.onDemand(),
       partitionKey: { name: 'id', type: AttributeType.NUMBER },
       tableClass: TableClass.STANDARD,
@@ -32,7 +36,7 @@ class DynamoDBStack extends NestedStack {
     });
     this.twitchAccounts = twitchAccountTable;
 
-    const twitchAccountBevyTicketTable = new TableV2(this, 'TwitchAccountsBevyTicketTable', {
+    const twitchAccountBevyTicketTable = new TableV2(this, 'TwitchAccountBevyTicketTable', {
       billing: Billing.onDemand(),
       partitionKey: { name: 'bevy_ticket_id', type: AttributeType.NUMBER },
       tableClass: TableClass.STANDARD,
