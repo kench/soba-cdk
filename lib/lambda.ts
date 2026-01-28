@@ -29,9 +29,10 @@ export class LambdaStack extends NestedStack {
         // This function queries the Twitch API for Twitch user information and populates
         // the DynamoDB tables containing account and ticket ownership information.
         const twitchAccountSyncFunction = new Function(this, 'TwitchAccountSync', {
+            functionName: 'TwitchAccountSync',
             architecture: Architecture.ARM_64,
             runtime: Runtime.JAVA_21,
-            timeout: Duration.seconds(10),
+            timeout: Duration.seconds(60),
             memorySize: 512,
             handler: 'org.seattleoba.lambda.SQSEventRequestHandler',
             code: lambdaCode,
@@ -48,8 +49,8 @@ export class LambdaStack extends NestedStack {
         props.twitchClientSecret.grantRead(twitchAccountSyncFunction);
 
         twitchAccountSyncFunction.addEventSource(new SqsEventSource(props.bevyTicketEventsQueue, {
-            batchSize: 10,
-            maxBatchingWindow: Duration.minutes(5),
+            batchSize: 2,
+            maxBatchingWindow: Duration.seconds(10),
             maxConcurrency: 2,
             metricsConfig: {
                 metrics: [MetricType.EVENT_COUNT]
@@ -59,6 +60,7 @@ export class LambdaStack extends NestedStack {
 
         // AWS Lambda function for sending Bevy Ticket DynamoDB table updates to SQS.
         const bevyTicketEventsFunction = new Function(this, 'BevyTicketEvents', {
+            functionName: 'BevyTicketStreamProcessor',
             architecture: Architecture.ARM_64,
             runtime: Runtime.JAVA_21,
             timeout: Duration.seconds(10),
@@ -75,17 +77,19 @@ export class LambdaStack extends NestedStack {
         bevyTicketEventsFunction.addEventSource(new DynamoEventSource(props.bevyTickets, {
             batchSize: 100,
             startingPosition: StartingPosition.LATEST,
-            maxBatchingWindow: Duration.minutes(5),
+            maxBatchingWindow: Duration.seconds(10),
             metricsConfig: {
                 metrics: [MetricType.EVENT_COUNT]
             },
             parallelizationFactor: 1,
             reportBatchItemFailures: true,
-            retryAttempts: 2,
+            retryAttempts: 10,
+            bisectBatchOnError: true,
         }));
 
         // AWS Lambda function that ingests ticketing records from Bevy
         const bevyImportFunction = new Function(this, 'BevyRosterImport', {
+            functionName: 'BevyRosterImport',
             architecture: Architecture.ARM_64,
             runtime: Runtime.JAVA_21,
             timeout: Duration.seconds(60),
